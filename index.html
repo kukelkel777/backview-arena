@@ -420,7 +420,7 @@ const SKILLS={
     S({key:'P', name:'필살: 천열각',anim:'super',    startup:14,active:8,recovery:26,cd:0,dmg:25,range:3.4,react:'launch',launch:.64,stun:42,color:'#ff5050'}),
   ],
   gooner:[
-    S({key:'U', name:'물방울',     anim:'throw', type:'proj', startup:6,active:1,recovery:10,cd:8, dmg:2, range:7, projCount:3,projSpread:0.16,projSpeed:0.42, react:'stun',stun:8,charge:0.34,color:'#eaf7ff'}),
+    S({key:'U', name:'물방울',     anim:'throw', type:'proj', startup:6,active:1,recovery:10,cd:8, dmg:2, range:3.2, projCount:3,projSpread:0.16,projSpeed:0.20, react:'stun',stun:8,charge:0.34,color:'#eaf7ff'}),
     S({key:'I', name:'밀쳐 돌진',  anim:'tackle',special:'dashreturn',dashCount:1, startup:3,active:6,recovery:6,cd:34, dmg:4, range:2.6, dashSpeed:0.72,dashRange:6,dashFrames:14, react:'knock',stun:18,kb:.7,charge:0.5,color:'#7fd0ff'}),
     S({key:'O', name:'내리찍기',   anim:'dive', special:'dive', airOnly:true, startup:2,active:6,recovery:6,cd:30, dmg:6, range:2.6, diveH:0.34,diveV:0.5, react:'launch',launch:.5,stun:30,charge:0.5,color:'#9fe0ff'}),
     S({key:'⇧U',name:'물 폭탄',    anim:'throw', type:'proj', startup:8,active:1,recovery:14,cd:46, dmg:2, range:8, projCount:7,projSpread:0.20,projSpeed:0.46, react:'stun',stun:8,color:'#eaf7ff'}),
@@ -428,16 +428,28 @@ const SKILLS={
     S({key:'⇧O',name:'자동 내리찍기',anim:'dive', special:'dive', autoJump:true, startup:8,active:6,recovery:6,cd:70, dmg:7, range:2.7, diveH:0.36,diveV:0.52, react:'launch',launch:.55,stun:34,color:'#9fe0ff'}),
     S({key:'P', name:'필살: 물 살포',anim:'spin', special:'spray', startup:6,active:120,recovery:10,cd:0, dmg:2, range:7.5, react:'stun',stun:0,color:'#eaf7ff'}),
   ],
+  gei:[
+    S({key:'U', name:'돌진',       anim:'tackle', type:'dash', startup:4,active:6,recovery:10,cd:14, dmg:3, range:2.4, dashSpeed:0.55, react:'knock',stun:12,kb:.3,charge:0.34,color:'#caa6ff'}),
+    S({key:'I', name:'면역',       anim:'immune', special:'immune', immuneDur:150, startup:4,active:1,recovery:24,cd:120, dmg:0, charge:0, color:'#ffe07a'}),
+    S({key:'O', name:'쳐올리기',   anim:'uppercut', startup:9,active:5,recovery:20,cd:40, dmg:5, range:2.3, react:'launch',launch:.9,stun:40,charge:0.5,color:'#caa6ff'}),
+    S({key:'⇧U',name:'긴 돌진',    anim:'tackle', type:'dash', startup:4,active:12,recovery:12,cd:40, dmg:5, range:2.5, dashSpeed:0.62, react:'knock',stun:14,kb:.4,color:'#caa6ff'}),
+    S({key:'⇧I',name:'—',         disabled:true, startup:1,active:1,recovery:1,cd:0, dmg:0, color:'#444a5c'}),
+    S({key:'⇧O',name:'데스롤',     anim:'spin', special:'deathroll', startup:6,active:48,recovery:16,cd:90, dmg:3, range:2.4, stun:26, color:'#caa6ff'}),
+    S({key:'P', name:'필살: 회복 돌진',anim:'tackle', special:'healcharge', startup:8,active:55,recovery:14,cd:0, dmg:18, range:2.6, dashSpeed:1.05, react:'launch',launch:.6,stun:36,color:'#ffd24a'}),
+  ],
 };
 const CHARS={
   striker:{ name:'스트라이커', en:'STRIKER', role:'COUNTER', emoji:'⚡', robe:0x3aa0ff, accent:0xa0f0ff, skin:0xf0d0b0,
     build:0.95, hp:192, speed:0.140, stats:{파워:4,스피드:4,리치:4,콤보:4},
     blurb:'긴 발차기로 견제하다 라이징킥으로 띄워 굴리는 기교파. 리치와 기동력의 균형이 강점.' },
   gooner:{ name:'구너', en:'GOONER', role:'AQUA', emoji:'💧', robe:0xdfeefc, accent:0x4fb8ff, skin:0xf0d8c0,
-    build:1.0, hp:208, speed:0.140, stats:{파워:3,스피드:4,리치:5,콤보:3},
+    build:1.0, hp:120, speed:0.140, stats:{파워:3,스피드:4,리치:5,콤보:3},
     blurb:'하얀 물방울을 흩뿌리고 밀쳐 돌진·공중 내리찍기로 흔드는 물의 트릭스터. 궁극기로 사방에 물을 살포해 적을 약화시킨다.' },
+  gei:{ name:'게이', en:'GEI', role:'TANK', emoji:'🛡️', robe:0x8e6cc3, accent:0xffd24a, skin:0xe8c39a,
+    build:1.35, hp:280, speed:0.112, stats:{파워:3,스피드:2,리치:3,콤보:2},
+    blurb:'단단하게 버티는 탱커. 돌진으로 파고들고, 면역으로 군중제어를 무시하며, 붙잡아 데스롤로 굴린다. 궁극기로 체력을 회복하며 초고속 돌진.' },
 };
-const ROSTER=['striker','gooner'];
+const ROSTER=['striker','gooner','gei'];
 
 // ── 인간형 모델 ──
 function buildModel(opts){
@@ -490,7 +502,7 @@ function makeFighter(idx,charId,human){
     stun:0,invuln:0,air:false,launched:false,down:false,downT:0,dead:false,
     act:null,cd:new Array(7).fill(0), combo:0,comboTimer:0,bestCombo:0,flash:0,
     shiftCharge:[0,0,0], shiftWindow:[0,0,0], ultCharge:0, ultReady:false, victory:false,
-    dmgDebuff:1, dmgDebuffT:0,
+    dmgDebuff:1, dmgDebuffT:0, immuneT:0,
     dir:{x:idx===0?1:-1,z:0}, moving:false,walk:0,
     skills:SKILLS[charId], mesh:buildModel(ch), hitDbg:buildHitDbg(),
     aiTimer:0,aiMvx:0,aiMvz:0,aiJump:false,aiSkill:null, jumpReq:false,skillReq:null };
@@ -501,7 +513,7 @@ function resetFighter(f){
   f.hp=f.maxHp; f.stun=0; f.invuln=20; f.air=false; f.launched=false; f.down=false; f.downT=0; f.dead=false;
   f.act=null; f.cd.fill(0); f.combo=0; f.comboTimer=0; f.flash=0; f.moving=false; f.walk=0;
   f.shiftCharge=[0,0,0]; f.shiftWindow=[0,0,0]; f.ultCharge=0; f.ultReady=false; f.victory=false;
-  f.dmgDebuff=1; f.dmgDebuffT=0;
+  f.dmgDebuff=1; f.dmgDebuffT=0; f.immuneT=0;
   f.dir={x:f.idx===0?1:-1,z:0}; f.jumpReq=false; f.skillReq=null; f.aiSkill=null;
 }
 let f1=null,f2=null,fighters=[];
@@ -520,7 +532,7 @@ function flashScreen(color,dur){ if(!flashEl){ flashEl=document.createElement('d
   flashEl.style.cssText='position:fixed;inset:0;z-index:5;pointer-events:none;opacity:0;'; document.body.appendChild(flashEl); }
   flashColor=color; flashT=dur; flashMax=dur; }
 // 스킬 사용 가능 여부: 기본기는 항상, 충전기는 창 열림, 궁극은 충전 완료
-function canUseSkill(f,idx){ if(idx>=3&&idx<=5) return f.shiftWindow[idx-3]>0; if(idx===6) return f.ultReady; return true; }
+function canUseSkill(f,idx){ if(f.skills[idx].disabled) return false; if(idx>=3&&idx<=5) return f.shiftWindow[idx-3]>0; if(idx===6) return f.ultReady; return true; }
 // 궁극기 발동 시네마틱
 function ultCinematic(f){ flashScreen('#ffffff',10); freezeT=Math.max(freezeT,16); shake(1.3,26);
   banner(f.skills[6].name,'#ffce4a'); cineFocus=f; cineT=46;
@@ -543,10 +555,13 @@ function applyHit(att,opp,sk,srcIdx){
   att.comboTimer=100; if(att.combo>att.bestCombo) att.bestCombo=att.combo;
   spawnHitFx(opp.x,opp.y+1.2,opp.z,sk.color,heavy);
   spawnDamage(opp.x,opp.y+2.0,opp.z,dmg,heavy);
-  opp.stun=Math.max(opp.stun,sk.stun);
-  if(sk.react==='knock'){ opp.vx=dir.x*sk.kb; opp.vz=dir.z*sk.kb; }
-  else if(sk.react==='launch'){ opp.vy=sk.launch; opp.air=true; opp.launched=true; opp.vx=dir.x*(sk.kb||.12); opp.vz=dir.z*(sk.kb||.12); }
-  else { opp.vx=dir.x*.08; opp.vz=dir.z*.08; }
+  if(opp.immuneT>0){ /* 면역: 경직·넉백·띄우기 등 해로운 효과 무시(데미지는 받음) */ }
+  else {
+    opp.stun=Math.max(opp.stun,sk.stun);
+    if(sk.react==='knock'){ opp.vx=dir.x*sk.kb; opp.vz=dir.z*sk.kb; }
+    else if(sk.react==='launch'){ opp.vy=sk.launch; opp.air=true; opp.launched=true; opp.vx=dir.x*(sk.kb||.12); opp.vz=dir.z*(sk.kb||.12); }
+    else { opp.vx=dir.x*.08; opp.vz=dir.z*.08; }
+  }
   freezeT=Math.max(freezeT,heavy?6:3); shake(heavy?.7:.3, heavy?12:6);
   sfx(heavy?'heavy':'hit');
   // 충전: 기본기(0~2) 적중 → 같은 칸 충전기 / 모든 적중 → 궁극 (투사체는 srcIdx 사용)
@@ -603,6 +618,9 @@ function processAction(f){
   if(sk.special==='dashreturn'){ updateDashReturn(f,sk); return; }   // 밀쳐 돌진 후 복귀
   if(sk.special==='dive'){ updateDive(f,sk); return; }               // 공중 내리찍기
   if(sk.special==='spray'){ updateSpray(f,sk); return; }             // 궁극: 물 살포
+  if(sk.special==='immune'){ updateImmune(f,sk); return; }           // 게이: 면역
+  if(sk.special==='deathroll'){ updateDeathRoll(f,sk); return; }     // 게이: 데스롤
+  if(sk.special==='healcharge'){ updateHealCharge(f,sk); return; }   // 게이 궁극: 회복 돌진
   const s=sk.startup,a=sk.active,r=sk.recovery,T=f.act.t;
   if(T===s && sk.type==='dash'){ f.vx=f.dir.x*sk.dashSpeed; f.vz=f.dir.z*sk.dashSpeed; }
   if(T===s && sk.type==='proj'){ spawnProjectiles(f,sk,f.act.idx); } // 물방울 투척
@@ -626,7 +644,7 @@ function spawnProjectiles(f,sk,srcIdx){
       new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xaad8ff,emissiveIntensity:0.5,roughness:0.3}));
     mesh.castShadow=true; scene.add(mesh);
     projs.push({owner:f,sk,srcIdx, x:f.x+dx*1.0,y:1.5,z:f.z+dz*1.0,
-      vx:dx*(sk.projSpeed||0.42), vz:dz*(sk.projSpeed||0.42), vy:0.12, life:90, mesh});
+      vx:dx*(sk.projSpeed||0.42), vz:dz*(sk.projSpeed||0.42), vy:0.07, life:90, mesh});
   }
   sfx('whoosh');
 }
@@ -692,13 +710,51 @@ function updateSpray(f,sk){
       spawnHitFx(f.x+Math.cos(ang)*rr, .4+Math.random()*2.2, f.z+Math.sin(ang)*rr, '#eaf7ff', false); }
     const opp=f.foe;
     if(opp && !opp.dead && opp.invuln<=0 && Math.hypot(opp.x-f.x,opp.z-f.z)<(sk.range||7.5)){
-      if(a.t%12===0){ const d=sk.dmg||3; opp.hp=Math.max(0,opp.hp-d); opp.flash=4;
+      if(a.t%24===0){ const d=sk.dmg||3; opp.hp=Math.max(0,opp.hp-d); opp.flash=4;
         spawnDamage(opp.x,opp.y+2,opp.z,d,false); spawnHitFx(opp.x,opp.y+1.2,opp.z,'#eaf7ff',false);
         if(opp.hp<=0) onKO(opp); }
-      if(!a.debuffed){ opp.dmgDebuff=0.5; opp.dmgDebuffT=300; a.debuffed=true;
+      if(!a.debuffed && opp.immuneT<=0){ opp.dmgDebuff=0.5; opp.dmgDebuffT=300; a.debuffed=true;
         spawnFloatText(opp.x,opp.y+2.6,opp.z,'약화!','#9fe0ff',true); }
     }
   } else f.act=null;
+}
+
+// ── 게이: 면역 버프(밀쳐짐·경직·데미지감소 등 해로운 효과 무시) ──
+function updateImmune(f,sk){
+  const a=f.act;
+  if(a.t===0){ f.immuneT=sk.immuneDur||150; f.dmgDebuffT=0;
+    spawnFloatText(f.x,f.y+2.7,f.z,'면역!','#ffe07a',true); spawnHitFx(f.x,f.y+1.2,f.z,'#ffe07a',true); sfx('ui'); }
+  a.t++;
+  if(a.t>sk.startup+sk.recovery) f.act=null;
+}
+// ── 게이: 붙잡아 제자리 데스롤 ──
+function updateDeathRoll(f,sk){
+  const a=f.act, opp=f.foe;
+  if(a.t===0){ a.dir={x:f.dir.x,z:f.dir.z};
+    a.grab=!!(opp && !opp.dead && opp.invuln<=0 && opp.immuneT<=0 && meleeConnect(f,sk)); }
+  a.t++;
+  if(a.grab && opp && !opp.dead){
+    opp.x=f.x+a.dir.x*1.4; opp.z=f.z+a.dir.z*1.4; opp.vx=0; opp.vz=0; opp.stun=8; opp.launched=false;
+    if(a.t%8===0){ opp.hp=Math.max(0,opp.hp-(sk.dmg||3)); opp.flash=4;
+      spawnDamage(opp.x,opp.y+2,opp.z,sk.dmg||3,false); spawnHitFx(opp.x,opp.y+1.2,opp.z,'#caa6ff',false); shake(.3,5);
+      if(opp.hp<=0){ onKO(opp); f.act=null; return; } }
+    if(a.t>=sk.startup+sk.active){ opp.stun=sk.stun||26; opp.air=true; opp.launched=true; opp.vy=0.32;
+      opp.vx=a.dir.x*0.45; opp.vz=a.dir.z*0.45; spawnHitFx(opp.x,opp.y+1,opp.z,'#caa6ff',true); shake(.6,12); f.act=null; }
+  } else if(a.t>sk.startup+sk.recovery) f.act=null;   // 헛잡음
+}
+// ── 게이 궁극: 30% 회복 + 초고속 돌진(사거리 무제한) ──
+function updateHealCharge(f,sk){
+  const a=f.act;
+  if(a.t===0){ const heal=Math.round(f.maxHp*0.3); f.hp=Math.min(f.maxHp,f.hp+heal);
+    spawnFloatText(f.x,f.y+2.7,f.z,'+'+heal,'#7fffa0',true); spawnHitFx(f.x,f.y+1.2,f.z,'#7fffa0',true);
+    a.dir={x:f.dir.x,z:f.dir.z}; a.hit=false; }
+  a.t++;
+  if(a.t>=sk.startup){
+    a.dir={x:f.dir.x,z:f.dir.z};
+    f.vx=a.dir.x*(sk.dashSpeed||1.05); f.vz=a.dir.z*(sk.dashSpeed||1.05);
+    if(!a.hit && meleeConnect(f,sk)){ applyHit(f,f.foe,sk); a.hit=true; shake(.8,16); f.act=null; return; }
+  }
+  if(a.t>sk.startup+(sk.active||55)) f.act=null;
 }
 
 // ── AI (근접) ──
@@ -720,6 +776,7 @@ function tickFighter(f){
   for(let i=0;i<7;i++) if(f.cd[i]>0) f.cd[i]--;
   for(let b=0;b<3;b++){ if(f.shiftWindow[b]>0){ f.shiftWindow[b]--; if(f.shiftWindow[b]<=0) f.shiftCharge[b]=0; } }
   if(f.dmgDebuffT>0) f.dmgDebuffT--;
+  if(f.immuneT>0) f.immuneT--;
   if(f.stun>0)f.stun--; if(f.invuln>0)f.invuln--; if(f.flash>0)f.flash--;
   if(f.down){ f.downT--; if(f.downT<=0)f.down=false; }
   if(f.comboTimer>0){ f.comboTimer--; if(f.comboTimer===0)f.combo=0; }
@@ -820,6 +877,7 @@ function poseFighter(f,now){
       case 'slide': { const o=pos(k); lLx=o*-1.3; lRx=o*-1.3; torsoY=-o*.45; tilt=-o*.15; lunge=o*.4; aLx=-1.1; aRx=-1.1; } break;
       case 'throw': aRx=-2.1+pos(k)*1.7; aRz=-.1; tilt=pos(k)*.16; break;        // 아래로 던지기
       case 'dive': tilt=.5; lunge=.3; aLx=-1.4; aRx=-1.4; lLx=.6; lRx=.6; break;   // 내리찍기
+      case 'immune': aLx=-1.1; aRx=-1.1; aLz=.55; aRz=-.55; tilt=-.08; break;        // 면역 가드
       default: aRx=-.35+k*-1.35; aRz=-.1; tilt=pos(k)*.12; break;
     }
   }
@@ -841,6 +899,7 @@ function syncMesh(f,now){
   poseFighter(f,now);
   const fl=f.flash>0?.7:(f.stun>0?.18:0);
   for(const m of f.mesh.userData.mats){ m.emissive.setRGB(fl,fl*.18,fl*.18); m.emissiveIntensity=fl?1:0; }
+  if(f.immuneT>0){ for(const m of f.mesh.userData.mats){ m.emissive.setRGB(.5,.42,.12); m.emissiveIntensity=1; } }  // 면역 금빛
 }
 
 // ── 카메라 ──
