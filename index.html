@@ -420,21 +420,21 @@ const SKILLS={
     S({key:'P', name:'필살: 천열각',anim:'super',    startup:14,active:8,recovery:26,cd:0,dmg:25,range:3.4,react:'launch',launch:.64,stun:42,color:'#ff5050'}),
   ],
   gooner:[
-    S({key:'U', name:'물방울',     anim:'throw', type:'proj', startup:6,active:1,recovery:10,cd:8, dmg:4, range:7, projCount:3,projSpread:0.16,projSpeed:0.42, react:'stun',stun:8,charge:0.34,color:'#eaf7ff'}),
-    S({key:'I', name:'밀쳐 돌진',  anim:'tackle',special:'dashreturn',dashCount:1, startup:3,active:6,recovery:6,cd:34, dmg:8, range:2.6, dashSpeed:0.72,dashRange:6,dashFrames:14, react:'knock',stun:18,kb:.7,charge:0.5,color:'#7fd0ff'}),
-    S({key:'O', name:'내리찍기',   anim:'dive', special:'dive', airOnly:true, startup:2,active:6,recovery:6,cd:30, dmg:11, range:2.6, diveH:0.34,diveV:0.5, react:'launch',launch:.5,stun:30,charge:0.5,color:'#9fe0ff'}),
-    S({key:'⇧U',name:'물 폭탄',    anim:'throw', type:'proj', startup:8,active:1,recovery:14,cd:46, dmg:4, range:8, projCount:7,projSpread:0.20,projSpeed:0.46, react:'stun',stun:8,color:'#eaf7ff'}),
-    S({key:'⇧I',name:'이중 돌진',  anim:'tackle',special:'dashreturn',dashCount:2, startup:3,active:6,recovery:6,cd:64, dmg:9, range:2.6, dashSpeed:0.78,dashRange:6,dashFrames:14, react:'knock',stun:18,kb:.7,color:'#7fd0ff'}),
-    S({key:'⇧O',name:'자동 내리찍기',anim:'dive', special:'dive', autoJump:true, startup:8,active:6,recovery:6,cd:70, dmg:13, range:2.7, diveH:0.36,diveV:0.52, react:'launch',launch:.55,stun:34,color:'#9fe0ff'}),
-    S({key:'P', name:'필살: 물 살포',anim:'spin', special:'spray', startup:6,active:120,recovery:10,cd:0, dmg:3, range:7.5, react:'stun',stun:0,color:'#eaf7ff'}),
+    S({key:'U', name:'물방울',     anim:'throw', type:'proj', startup:6,active:1,recovery:10,cd:8, dmg:2, range:7, projCount:3,projSpread:0.16,projSpeed:0.42, react:'stun',stun:8,charge:0.34,color:'#eaf7ff'}),
+    S({key:'I', name:'밀쳐 돌진',  anim:'tackle',special:'dashreturn',dashCount:1, startup:3,active:6,recovery:6,cd:34, dmg:4, range:2.6, dashSpeed:0.72,dashRange:6,dashFrames:14, react:'knock',stun:18,kb:.7,charge:0.5,color:'#7fd0ff'}),
+    S({key:'O', name:'내리찍기',   anim:'dive', special:'dive', airOnly:true, startup:2,active:6,recovery:6,cd:30, dmg:6, range:2.6, diveH:0.34,diveV:0.5, react:'launch',launch:.5,stun:30,charge:0.5,color:'#9fe0ff'}),
+    S({key:'⇧U',name:'물 폭탄',    anim:'throw', type:'proj', startup:8,active:1,recovery:14,cd:46, dmg:2, range:8, projCount:7,projSpread:0.20,projSpeed:0.46, react:'stun',stun:8,color:'#eaf7ff'}),
+    S({key:'⇧I',name:'이중 돌진',  anim:'tackle',special:'dashreturn',dashCount:2, startup:3,active:6,recovery:6,cd:64, dmg:5, range:2.6, dashSpeed:0.78,dashRange:6,dashFrames:14, react:'knock',stun:18,kb:.7,color:'#7fd0ff'}),
+    S({key:'⇧O',name:'자동 내리찍기',anim:'dive', special:'dive', autoJump:true, startup:8,active:6,recovery:6,cd:70, dmg:7, range:2.7, diveH:0.36,diveV:0.52, react:'launch',launch:.55,stun:34,color:'#9fe0ff'}),
+    S({key:'P', name:'필살: 물 살포',anim:'spin', special:'spray', startup:6,active:120,recovery:10,cd:0, dmg:2, range:7.5, react:'stun',stun:0,color:'#eaf7ff'}),
   ],
 };
 const CHARS={
   striker:{ name:'스트라이커', en:'STRIKER', role:'COUNTER', emoji:'⚡', robe:0x3aa0ff, accent:0xa0f0ff, skin:0xf0d0b0,
-    build:0.95, hp:96, speed:0.140, stats:{파워:4,스피드:4,리치:4,콤보:4},
+    build:0.95, hp:192, speed:0.140, stats:{파워:4,스피드:4,리치:4,콤보:4},
     blurb:'긴 발차기로 견제하다 라이징킥으로 띄워 굴리는 기교파. 리치와 기동력의 균형이 강점.' },
   gooner:{ name:'구너', en:'GOONER', role:'AQUA', emoji:'💧', robe:0xdfeefc, accent:0x4fb8ff, skin:0xf0d8c0,
-    build:1.0, hp:104, speed:0.140, stats:{파워:3,스피드:4,리치:5,콤보:3},
+    build:1.0, hp:208, speed:0.140, stats:{파워:3,스피드:4,리치:5,콤보:3},
     blurb:'하얀 물방울을 흩뿌리고 밀쳐 돌진·공중 내리찍기로 흔드는 물의 트릭스터. 궁극기로 사방에 물을 살포해 적을 약화시킨다.' },
 };
 const ROSTER=['striker','gooner'];
