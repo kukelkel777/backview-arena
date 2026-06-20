@@ -252,12 +252,12 @@
 // ════════════════════════════════════════════════════════════════════
 
 // ── 튜닝 상수 ──
-const STEP=1000/60, GRAV=0.030, JUMP=0.46, R=12, BODY=0.95;
+const STEP=1000/60, GRAV=0.030, JUMP=0.46, R=16, BODY=0.95;
 const ROUND_TIME=60;                       // 라운드 제한시간(초)
 const SHIFT_WINDOW=360;                     // SHIFT 충전기 사용 가능 시간(틱, 약 6초)
 const ULT_PER_DMG=0.013;                    // 누적 데미지 → 궁극 충전(약 77 데미지면 풀충전)
-const PADS=[{x:-6.5,z:10.2,hw:2.7,hz:1.9},{x:6.5,z:10.2,hw:2.7,hz:1.9}];
-const SPAWN=[{x:-5,z:5.5},{x:5,z:5.5}];
+const PADS=[{x:-8.5,z:13.4,hw:3,hz:2.2},{x:8.5,z:13.4,hw:3,hz:2.2}];
+const SPAWN=[{x:-6.5,z:8},{x:6.5,z:8}];
 let DEBUG=false;
 
 // ── Three 기본 ──
@@ -426,7 +426,7 @@ const SKILLS={
     S({key:'⇧U',name:'물 폭탄',    anim:'throw', type:'proj', startup:8,active:1,recovery:14,cd:46, dmg:2, range:8, projCount:7,projSpread:0.20,projSpeed:0.46, react:'stun',stun:8,color:'#eaf7ff'}),
     S({key:'⇧I',name:'이중 돌진',  anim:'tackle',special:'dashreturn',dashCount:2, startup:3,active:6,recovery:6,cd:64, dmg:5, range:2.6, dashSpeed:0.78,dashRange:6,dashFrames:14, react:'knock',stun:18,kb:.7,color:'#7fd0ff'}),
     S({key:'⇧O',name:'자동 내리찍기',anim:'dive', special:'dive', autoJump:true, startup:8,active:6,recovery:6,cd:70, dmg:7, range:2.7, diveH:0.36,diveV:0.52, react:'launch',launch:.55,stun:34,color:'#9fe0ff'}),
-    S({key:'P', name:'필살: 물 살포',anim:'spin', special:'spray', startup:6,active:120,recovery:10,cd:0, dmg:2, range:7.5, react:'stun',stun:0,color:'#eaf7ff'}),
+    S({key:'P', name:'필살: 물 살포',anim:'spin', special:'spray', startup:6,active:120,recovery:10,cd:0, dmg:2, range:6.5, react:'stun',stun:0,color:'#eaf7ff'}),
   ],
   gei:[
     S({key:'U', name:'돌진',       anim:'tackle', type:'dash', startup:4,active:6,recovery:10,cd:14, dmg:3, range:2.4, dashSpeed:0.55, react:'knock',stun:12,kb:.3,charge:0.34,color:'#caa6ff'}),
@@ -706,7 +706,7 @@ function updateSpray(f,sk){
   const a=f.act; a.t++;
   const dur=sk.active||120;
   if(a.t<=dur){
-    for(let i=0;i<3;i++){ const ang=Math.random()*7, rr=Math.random()*(R-1);
+    for(let i=0;i<3;i++){ const ang=Math.random()*7, rr=Math.random()*((sk.range||6.5)+0.5);
       spawnHitFx(f.x+Math.cos(ang)*rr, .4+Math.random()*2.2, f.z+Math.sin(ang)*rr, '#eaf7ff', false); }
     const opp=f.foe;
     if(opp && !opp.dead && opp.invuln<=0 && Math.hypot(opp.x-f.x,opp.z-f.z)<(sk.range||7.5)){
