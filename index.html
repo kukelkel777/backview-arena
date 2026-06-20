@@ -548,7 +548,7 @@ function meleeConnect(att,sk){ const opp=att.foe;
   return true; }
 function applyHit(att,opp,sk,srcIdx){
   const dir=att.dir;
-  let dmg=sk.dmg; if(att.dmgDebuffT>0) dmg=Math.max(1,Math.round(dmg*att.dmgDebuff));  // 약화 시 데미지 감소
+  let dmg=sk.dmg*dmgMult; if(att.dmgDebuffT>0) dmg*=att.dmgDebuff; dmg=Math.max(1,Math.round(dmg));  // 오버드라이브 ×2 / 약화 감소
   const heavy=(dmg>=10||sk.react==='launch');
   opp.hp=Math.max(0,opp.hp-dmg); opp.flash=6;
   if(opp.stun>0||opp.air) att.combo++; else att.combo=1;
@@ -710,7 +710,7 @@ function updateSpray(f,sk){
       spawnHitFx(f.x+Math.cos(ang)*rr, .4+Math.random()*2.2, f.z+Math.sin(ang)*rr, '#eaf7ff', false); }
     const opp=f.foe;
     if(opp && !opp.dead && opp.invuln<=0 && Math.hypot(opp.x-f.x,opp.z-f.z)<(sk.range||7.5)){
-      if(a.t%24===0){ const d=sk.dmg||3; opp.hp=Math.max(0,opp.hp-d); opp.flash=4;
+      if(a.t%24===0){ const d=Math.round((sk.dmg||3)*dmgMult); opp.hp=Math.max(0,opp.hp-d); opp.flash=4;
         spawnDamage(opp.x,opp.y+2,opp.z,d,false); spawnHitFx(opp.x,opp.y+1.2,opp.z,'#eaf7ff',false);
         if(opp.hp<=0) onKO(opp); }
       if(!a.debuffed && opp.immuneT<=0){ opp.dmgDebuff=0.5; opp.dmgDebuffT=300; a.debuffed=true;
@@ -735,8 +735,8 @@ function updateDeathRoll(f,sk){
   a.t++;
   if(a.grab && opp && !opp.dead){
     opp.x=f.x+a.dir.x*1.4; opp.z=f.z+a.dir.z*1.4; opp.vx=0; opp.vz=0; opp.stun=8; opp.launched=false;
-    if(a.t%8===0){ opp.hp=Math.max(0,opp.hp-(sk.dmg||3)); opp.flash=4;
-      spawnDamage(opp.x,opp.y+2,opp.z,sk.dmg||3,false); spawnHitFx(opp.x,opp.y+1.2,opp.z,'#caa6ff',false); shake(.3,5);
+    if(a.t%8===0){ const dr=Math.round((sk.dmg||3)*dmgMult); opp.hp=Math.max(0,opp.hp-dr); opp.flash=4;
+      spawnDamage(opp.x,opp.y+2,opp.z,dr,false); spawnHitFx(opp.x,opp.y+1.2,opp.z,'#caa6ff',false); shake(.3,5);
       if(opp.hp<=0){ onKO(opp); f.act=null; return; } }
     if(a.t>=sk.startup+sk.active){ opp.stun=sk.stun||26; opp.air=true; opp.launched=true; opp.vy=0.32;
       opp.vx=a.dir.x*0.45; opp.vz=a.dir.z*0.45; spawnHitFx(opp.x,opp.y+1,opp.z,'#caa6ff',true); shake(.6,12); f.act=null; }
@@ -805,12 +805,18 @@ function tickFighter(f){
 
 // ── 라운드/매치 ──
 let phase='title', phaseT=0, wins=[0,0], round=1, timeLeft=ROUND_TIME, timeTick=0;
+// 오버드라이브: 1분 경과 시 전원 데미지 2배 + 어두운 연출
+let overdrive=false, dmgMult=1;
+function resetOverdrive(){ overdrive=false; dmgMult=1; scene.fog.near=40; scene.fog.far=160; sun.intensity=1.15; }
+function enterOverdrive(){ overdrive=true; dmgMult=2;
+  scene.fog.near=22; scene.fog.far=62; sun.intensity=0.55;   // 안개를 당겨 어둡게(그 검정 연출)
+  flashScreen('#000000',14); shake(1.0,22); banner('OVERDRIVE ×2','#ff5050'); sfx('ko'); }
 let curPlayer='blaze', curCpu='titan';
 
 function setHUD(on){ document.getElementById('hud').classList.toggle('on',on);
   document.getElementById('tray').classList.toggle('on',on); document.getElementById('help').classList.toggle('on',on);
   document.getElementById('timer').classList.toggle('on',on); }
-function beginRound(){ resetFighter(f1); resetFighter(f2); timeLeft=ROUND_TIME; timeTick=0; cineFocus=null; cineT=0;
+function beginRound(){ resetFighter(f1); resetFighter(f2); timeLeft=ROUND_TIME; timeTick=0; cineFocus=null; cineT=0; resetOverdrive();
   phase='intro'; phaseT=80; banner('ROUND '+round,'#eef2ff'); flashScreen('#1a2440',6); updateHP(true); updatePips(); }
 function startMatch(pc,cc){
   fighters.forEach(f=>scene.remove(f.mesh)); clearProjectiles();
@@ -845,7 +851,7 @@ function tick(){
   else if(phase==='win'){ phaseT--;
     if(phaseT%5===0&&winnerRef) spawnHitFx(winnerRef.x+(Math.random()-.5)*2.4,1+Math.random()*2.6,winnerRef.z+(Math.random()-.5)*2.4,'#ffd24a',false);
     if(phaseT<=0) showResult(); }
-  else if(phase==='fight'){ timeTick++; if(timeTick>=60){ timeTick=0; if(timeLeft>0)timeLeft--; if(timeLeft<=0) timeUp(); } }
+  else if(phase==='fight'){ timeTick++; if(timeTick>=60){ timeTick=0; if(timeLeft>0){ timeLeft--; if(timeLeft<=0 && !overdrive) enterOverdrive(); } } }
   if(fighters.length){ tickFighter(f1); tickFighter(f2); updateProjectiles(); }
 }
 
@@ -964,7 +970,9 @@ function updateTray(f){
     cell.classList.toggle('ready',ready); cell.classList.toggle('locked',locked);
   }
 }
-function updateTimer(){ document.getElementById('timer').textContent=Math.ceil(timeLeft); }
+function updateTimer(){ const el=document.getElementById('timer');
+  if(overdrive){ el.textContent='×2'; el.style.color='#ff5050'; }
+  else { el.textContent=Math.ceil(timeLeft); el.style.color='#fff'; } }
 
 // ── 메인 루프 ──
 let acc=0,last=performance.now();
@@ -1067,7 +1075,7 @@ function navActivate(){ if(!navList.length) return; const el=navList[navIdx];
   if(el.dataset && el.dataset.char) doConfirm(); else el.click(); }
 
 // ── 메뉴 동작 ──
-function gotoSelect(){ phase='select'; buildRoster(); fillSelInfo(); makePreview(selChar); show('select'); }
+function gotoSelect(){ resetOverdrive(); phase='select'; buildRoster(); fillSelInfo(); makePreview(selChar); show('select'); }
 function doConfirm(){ sfx('ui');
   curPlayer=selChar; const others=ROSTER.filter(x=>x!==selChar); curCpu=others[(Math.random()*others.length)|0];
   if(preview){ scene.remove(preview.mesh); preview=null; }
