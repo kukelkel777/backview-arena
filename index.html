@@ -253,7 +253,7 @@
 
 // ── 튜닝 상수 ──
 const STEP=1000/60, GRAV=0.030, JUMP=0.46, R=16, BODY=0.95;
-const ROUND_TIME=60;                       // 라운드 제한시간(초)
+const ROUND_TIME=30;                       // 라운드 제한시간(초)
 const SHIFT_WINDOW=360;                     // SHIFT 충전기 사용 가능 시간(틱, 약 6초)
 const ULT_PER_DMG=0.013;                    // 누적 데미지 → 궁극 충전(약 77 데미지면 풀충전)
 const PADS=[{x:-8.5,z:13.4,hw:3,hz:2.2},{x:8.5,z:13.4,hw:3,hz:2.2}];
@@ -420,7 +420,7 @@ const SKILLS={
     S({key:'P', name:'필살: 천열각',anim:'super',    startup:14,active:8,recovery:26,cd:0,dmg:25,range:3.4,react:'launch',launch:.64,stun:42,color:'#ff5050'}),
   ],
   gooner:[
-    S({key:'U', name:'물방울',     anim:'throw', type:'proj', startup:6,active:1,recovery:10,cd:8, dmg:2, range:3.2, projCount:3,projSpread:0.16,projSpeed:0.20, react:'stun',stun:8,charge:0.34,color:'#eaf7ff'}),
+    S({key:'U', name:'물방울',     anim:'throw', type:'proj', startup:6,active:1,recovery:18,cd:8, dmg:2, range:3.2, projCount:3,projSpread:0.16,projSpeed:0.20, react:'stun',stun:8,charge:0.34,color:'#eaf7ff'}),
     S({key:'I', name:'밀쳐 돌진',  anim:'tackle',special:'dashreturn',dashCount:1, startup:3,active:6,recovery:6,cd:34, dmg:4, range:2.6, dashSpeed:0.72,dashRange:6,dashFrames:14, react:'knock',stun:18,kb:.7,charge:0.5,color:'#7fd0ff'}),
     S({key:'O', name:'내리찍기',   anim:'dive', special:'dive', airOnly:true, startup:2,active:6,recovery:6,cd:30, dmg:6, range:2.6, diveH:0.34,diveV:0.5, react:'launch',launch:.5,stun:30,charge:0.5,color:'#9fe0ff'}),
     S({key:'⇧U',name:'물 폭탄',    anim:'throw', type:'proj', startup:8,active:1,recovery:14,cd:46, dmg:2, range:8, projCount:7,projSpread:0.20,projSpeed:0.46, react:'stun',stun:8,color:'#eaf7ff'}),
@@ -643,7 +643,7 @@ function spawnProjectiles(f,sk,srcIdx){
     const mesh=new THREE.Mesh(new THREE.SphereGeometry(0.28,10,8),
       new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xaad8ff,emissiveIntensity:0.5,roughness:0.3}));
     mesh.castShadow=true; scene.add(mesh);
-    projs.push({owner:f,sk,srcIdx, x:f.x+dx*1.0,y:1.5,z:f.z+dz*1.0,
+    projs.push({owner:f,sk,srcIdx, x:f.x+dx*1.0,y:1.0,z:f.z+dz*1.0,
       vx:dx*(sk.projSpeed||0.42), vz:dz*(sk.projSpeed||0.42), vy:0.07, life:90, mesh});
   }
   sfx('whoosh');
