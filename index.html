@@ -89,6 +89,13 @@
   #help{ position:fixed; bottom:20px; right:24px; z-index:3; color:var(--muted); font-size:11px; line-height:1.7;
     text-align:right; pointer-events:none; opacity:0; transition:.4s; }
   #help.on{ opacity:.9; }
+  #trainInfo{ position:fixed; top:62px; left:50%; transform:translateX(-50%); z-index:3; display:none;
+    text-align:center; font-size:16px; color:var(--ink); text-shadow:0 2px 6px #000; pointer-events:none; }
+  #trainInfo b{ color:var(--gold); font-family:var(--en); font-size:24px; }
+  #trainInfo .thint{ color:var(--muted); font-size:11px; }
+  .play.alt{ background:transparent; color:var(--ink); border:2px solid var(--line); box-shadow:none;
+    animation:none; font-size:16px; padding:12px 40px; margin-top:12px; }
+  .play.alt:hover{ border-color:var(--gold); box-shadow:none; transform:translateY(-2px); }
   kbd{ font-family:var(--en); font-size:10px; background:#1a2238; border:1px solid var(--line);
     border-radius:4px; padding:1px 5px; color:var(--ink); }
 
@@ -196,6 +203,7 @@
   <kbd>U</kbd><kbd>I</kbd><kbd>O</kbd> 기본기 · <kbd>SHIFT</kbd>+UIO 충전기 · <kbd>P</kbd> 궁극기<br>
   타격을 적중시키면 충전기·궁극기가 차오름 · <kbd>G</kbd> 히트박스
 </div>
+<div id="trainInfo"></div>
 
 <!-- TITLE -->
 <div id="title" class="scr on">
@@ -203,8 +211,9 @@
     <div class="logo"><div class="b">BACKVIEW</div><div class="a">ARENA</div></div>
     <div class="tagline">3D · 1 vs 1 · martial arena</div>
     <button class="play" id="playBtn">▶  PLAY</button>
+    <button class="play alt" id="trainBtn">🎯  훈련장</button>
   </div>
-  <div class="foot">PROTOTYPE v0.3 · WASD + UIOP · 로컬 vs CPU</div>
+  <div class="foot">PROTOTYPE v0.4 · WASD + UIOP · 로컬 vs CPU · 훈련장</div>
 </div>
 
 <!-- SELECT -->
@@ -240,6 +249,7 @@
     <div class="selbtns">
       <button class="btn" id="rematchBtn">다시 대결</button>
       <button class="btn ghost" id="toSelect">← 캐릭터 선택</button>
+      <button class="btn ghost" id="toTitle">메인 메뉴</button>
     </div>
   </div>
 </div>
@@ -437,6 +447,42 @@ const SKILLS={
     S({key:'⇧O',name:'데스롤',     anim:'spin', special:'deathroll', startup:6,active:48,recovery:16,cd:90, dmg:4, range:2.4, stun:26, color:'#caa6ff'}),
     S({key:'P', name:'필살: 회복 돌진',anim:'tackle', special:'healcharge', startup:8,active:55,recovery:14,cd:0, dmg:22, range:2.6, dashSpeed:1.05, react:'launch',launch:.6,stun:36,color:'#ffd24a'}),
   ],
+  gripper:[
+    S({key:'U', name:'잽',        anim:'punchR', startup:4,active:3,recovery:8,cd:4, dmg:5, range:2.5, react:'stun',stun:10,charge:0.5,color:'#ff9d5c'}),
+    S({key:'I', name:'커맨드 잡기', anim:'tackle', special:'grab', startup:5,active:8,recovery:20,cd:40, dmg:14, range:2.4, react:'knock',kb:.5,stun:24,charge:0.5,color:'#ffd25c'}),
+    S({key:'O', name:'어퍼',      anim:'uppercut', startup:8,active:4,recovery:18,cd:28,dmg:9, range:2.3, react:'launch',launch:.5,stun:30,charge:0.5,color:'#ff7d5c'}),
+    S({key:'⇧U',name:'연타',      anim:'punchRapid', startup:6,active:12,recovery:12,cd:44,dmg:4, range:2.5, react:'stun',stun:8,multi:3,color:'#ff9d5c'}),
+    S({key:'⇧I',name:'대형 잡기',  anim:'tackle', special:'grab', startup:7,active:10,recovery:24,cd:70, dmg:22, range:2.5, react:'launch',launch:.6,stun:40,color:'#ffd25c'}),
+    S({key:'⇧O',name:'회전 메치기',anim:'spin', startup:12,active:6,recovery:20,cd:64,dmg:13,range:3.0,arc:6.3,react:'launch',launch:.5,stun:34,color:'#ff7d5c'}),
+    S({key:'P', name:'필살: 자이언트 슬램',anim:'tackle', special:'grab', startup:8,active:12,recovery:26,cd:0, dmg:30, range:2.6, react:'launch',launch:.7,stun:44,color:'#ff5050'}),
+  ],
+  shade:[
+    S({key:'U', name:'단검',      anim:'punchR', startup:3,active:3,recovery:7,cd:3, dmg:4, range:2.4, react:'stun',stun:9,charge:0.5,color:'#b080ff'}),
+    S({key:'I', name:'그림자 이동', anim:'tackle', special:'teleport', followHit:true, startup:2,active:1,recovery:10,cd:30, dmg:3, range:2.4, react:'stun',stun:8,charge:0.5,color:'#c0a0ff'}),
+    S({key:'O', name:'공중 강습',  anim:'dive', special:'dive', airOnly:true, startup:2,active:6,recovery:8,cd:30,dmg:9, range:2.5, diveH:0.4,diveV:0.55, react:'launch',launch:.5,stun:30,charge:0.5,color:'#a070ff'}),
+    S({key:'⇧U',name:'연참',      anim:'punchRapid', startup:5,active:12,recovery:10,cd:40,dmg:4, range:2.4, react:'stun',stun:8,multi:3,color:'#b080ff'}),
+    S({key:'⇧I',name:'암습',      anim:'tackle', special:'teleport', followHit:true, startup:2,active:1,recovery:12,cd:60, dmg:13, range:2.5, react:'knock',kb:.4,stun:20,color:'#c0a0ff'}),
+    S({key:'⇧O',name:'비상 강습',  anim:'dive', special:'dive', autoJump:true, startup:8,active:6,recovery:10,cd:64,dmg:12,range:2.6, diveH:0.42,diveV:0.55, react:'launch',launch:.55,stun:34,color:'#a070ff'}),
+    S({key:'P', name:'필살: 그림자 난무',anim:'super', startup:10,active:14,recovery:24,cd:0, dmg:4, range:3.0, react:'stun',stun:10,multi:3,color:'#ff5050'}),
+  ],
+  nosf:[
+    S({key:'U', name:'할퀴기',    anim:'punchR', startup:5,active:3,recovery:9,cd:4, dmg:5, range:2.5, react:'stun',stun:10,charge:0.5,color:'#c0143c'}),
+    S({key:'I', name:'강타',      anim:'punchL', startup:9,active:4,recovery:14,cd:14,dmg:9, range:2.7, react:'knock',kb:.4,stun:16,charge:0.5,color:'#e02040'}),
+    S({key:'O', name:'끌어올리기', anim:'uppercut', startup:9,active:5,recovery:18,cd:28,dmg:10,range:2.4, react:'launch',launch:.5,stun:30,charge:0.5,color:'#ff3050'}),
+    S({key:'⇧U',name:'연격',      anim:'punchRapid', startup:6,active:12,recovery:12,cd:44,dmg:4, range:2.5, react:'stun',stun:8,multi:3,color:'#c0143c'}),
+    S({key:'⇧I',name:'흡혈 강타',  anim:'punchL', startup:10,active:5,recovery:16,cd:54,dmg:14,range:2.7, react:'knock',kb:.5,stun:20,color:'#e02040'}),
+    S({key:'⇧O',name:'회전 흡혈',  anim:'spin', startup:12,active:6,recovery:18,cd:60,dmg:12,range:3.0,arc:6.3,react:'launch',launch:.5,stun:34,color:'#ff3050'}),
+    S({key:'P', name:'필살: 피의 폭주',anim:'super', startup:14,active:8,recovery:26,cd:0, dmg:24, range:3.2, react:'launch',launch:.6,stun:42,color:'#ff5050'}),
+  ],
+  rage:[
+    S({key:'U', name:'도끼질',    anim:'punchR', startup:5,active:3,recovery:9,cd:4, dmg:5, range:2.6, react:'stun',stun:10,charge:0.5,color:'#ff6020'}),
+    S({key:'I', name:'강베기',    anim:'punchL', startup:10,active:4,recovery:14,cd:14,dmg:10,range:2.8, react:'knock',kb:.45,stun:16,charge:0.5,color:'#ff8020'}),
+    S({key:'O', name:'올려베기',  anim:'uppercut', startup:9,active:5,recovery:20,cd:30,dmg:10,range:2.4, react:'launch',launch:.5,stun:32,charge:0.5,color:'#ffa020'}),
+    S({key:'⇧U',name:'연속베기',  anim:'punchRapid', startup:6,active:12,recovery:12,cd:44,dmg:4, range:2.6, react:'stun',stun:8,multi:3,color:'#ff6020'}),
+    S({key:'⇧I',name:'분쇄',      anim:'hammer', startup:14,active:5,recovery:20,cd:56,dmg:15,range:2.7, react:'knock',kb:.6,stun:22,color:'#ff8020'}),
+    S({key:'⇧O',name:'회전베기',  anim:'spin', startup:12,active:8,recovery:20,cd:64,dmg:13,range:3.2,arc:6.3,react:'launch',launch:.54,stun:36,color:'#ffa020'}),
+    S({key:'P', name:'필살: 광란', anim:'super', startup:14,active:8,recovery:26,cd:0, dmg:24, range:3.3, react:'launch',launch:.62,stun:42,color:'#ff5050'}),
+  ],
 };
 const CHARS={
   striker:{ name:'스트라이커', en:'STRIKER', role:'COUNTER', emoji:'⚡', robe:0x3aa0ff, accent:0xa0f0ff, skin:0xf0d0b0,
@@ -448,8 +494,20 @@ const CHARS={
   gei:{ name:'게이', en:'GEI', role:'TANK', emoji:'🛡️', robe:0x8e6cc3, accent:0xffd24a, skin:0xe8c39a,
     build:1.35, hp:230, speed:0.112, stats:{파워:3,스피드:2,리치:3,콤보:2},
     blurb:'단단하게 버티는 탱커. 돌진으로 파고들고, 면역으로 군중제어를 무시하며, 붙잡아 데스롤로 굴린다. 궁극기로 체력을 회복하며 초고속 돌진.' },
+  gripper:{ name:'포획가', en:'GRIPPER', role:'GRAPPLER', emoji:'🤼', robe:0xd2691e, accent:0xffd24a, skin:0xe8c39a,
+    build:1.15, hp:185, speed:0.130, stats:{파워:4,스피드:3,리치:2,콤보:3},
+    blurb:'빠른 커맨드 잡기로 버티는 적을 끌어내 메치는 인파이터. 버티기 상대에 강하고 원거리에 약하다.' },
+  shade:{ name:'암살자', en:'SHADE', role:'ASSASSIN', emoji:'🗡️', robe:0x5b3a8e, accent:0xc0a0ff, skin:0xe8c39a,
+    build:0.9, hp:145, speed:0.160, stats:{파워:3,스피드:5,리치:3,콤보:5},
+    blurb:'그림자 이동으로 등 뒤를 노리는 기습형. 느린 적을 농락하지만 한 번 잡히면 무너진다.' },
+  nosf:{ name:'흡혈귀', en:'NOSF', role:'LEECH', emoji:'🩸', robe:0x6a0d1a, accent:0xff3050, skin:0xd8c0b0,
+    build:1.1, hp:210, speed:0.125, lifesteal:0.35, stats:{파워:3,스피드:3,리치:3,콤보:4},
+    blurb:'타격으로 체력을 흡수해 소모전을 지배한다. 견제·도트에 강하지만 폭발 화력엔 약하다.' },
+  rage:{ name:'광전사', en:'RAGE', role:'BERSERKER', emoji:'🪓', robe:0x8a2a0a, accent:0xff8020, skin:0xe8c39a,
+    build:1.15, hp:185, speed:0.130, rageChar:true, stats:{파워:5,스피드:3,리치:3,콤보:3},
+    blurb:'싸울수록 분노가 쌓여 데미지·속도가 오르는 역전형. 초반이 약해 빠른 러시에 취약하다.' },
 };
-const ROSTER=['striker','gooner','gei'];
+const ROSTER=['striker','gooner','gei','gripper','shade','nosf','rage'];
 
 // ── 인간형 모델 ──
 function buildModel(opts){
@@ -503,6 +561,7 @@ function makeFighter(idx,charId,human){
     act:null,cd:new Array(7).fill(0), combo:0,comboTimer:0,bestCombo:0,flash:0,
     shiftCharge:[0,0,0], shiftWindow:[0,0,0], ultCharge:0, ultReady:false, victory:false,
     dmgDebuff:1, dmgDebuffT:0, immuneT:0,
+    lifesteal:ch.lifesteal||0, rageChar:!!ch.rageChar, rage:0, dummy:false,
     dir:{x:idx===0?1:-1,z:0}, moving:false,walk:0,
     skills:SKILLS[charId], mesh:buildModel(ch), hitDbg:buildHitDbg(),
     aiTimer:0,aiMvx:0,aiMvz:0,aiJump:false,aiSkill:null, jumpReq:false,skillReq:null };
@@ -513,10 +572,11 @@ function resetFighter(f){
   f.hp=f.maxHp; f.stun=0; f.invuln=20; f.air=false; f.launched=false; f.down=false; f.downT=0; f.dead=false;
   f.act=null; f.cd.fill(0); f.combo=0; f.comboTimer=0; f.flash=0; f.moving=false; f.walk=0;
   f.shiftCharge=[0,0,0]; f.shiftWindow=[0,0,0]; f.ultCharge=0; f.ultReady=false; f.victory=false;
-  f.dmgDebuff=1; f.dmgDebuffT=0; f.immuneT=0;
+  f.dmgDebuff=1; f.dmgDebuffT=0; f.immuneT=0; f.rage=0;
   f.dir={x:f.idx===0?1:-1,z:0}; f.jumpReq=false; f.skillReq=null; f.aiSkill=null;
 }
 let f1=null,f2=null,fighters=[];
+let trainingMode=false, trainDamage=0, trainBestCombo=0;   // 훈련장
 
 function dirTo(a,b){ const dx=b.x-a.x,dz=b.z-a.z,l=Math.hypot(dx,dz);
   return l>1e-4?{x:dx/l,z:dz/l}:{x:a.dir.x,z:a.dir.z}; }
@@ -548,14 +608,19 @@ function meleeConnect(att,sk){ const opp=att.foe;
   return true; }
 function applyHit(att,opp,sk,srcIdx){
   const dir=att.dir;
-  let dmg=sk.dmg*dmgMult; if(att.dmgDebuffT>0) dmg*=att.dmgDebuff; dmg=Math.max(1,Math.round(dmg));  // 오버드라이브 ×2 / 약화 감소
+  let dmg=sk.dmg*dmgMult*(1+(att.rageChar?att.rage*0.6:0)); if(att.dmgDebuffT>0) dmg*=att.dmgDebuff; dmg=Math.max(1,Math.round(dmg));  // 오버드라이브×2 + 분노 / 약화
   const heavy=(dmg>=10||sk.react==='launch');
-  opp.hp=Math.max(0,opp.hp-dmg); opp.flash=6;
+  if(opp.dummy) trainDamage+=dmg; else opp.hp=Math.max(0,opp.hp-dmg);   // 더미는 체력 안 깎고 누적만
+  opp.flash=6;
   if(opp.stun>0||opp.air) att.combo++; else att.combo=1;
   att.comboTimer=100; if(att.combo>att.bestCombo) att.bestCombo=att.combo;
+  if(opp.dummy && att.combo>trainBestCombo) trainBestCombo=att.combo;
+  if(att.lifesteal>0) att.hp=Math.min(att.maxHp, att.hp+Math.round(dmg*att.lifesteal));   // 흡혈
+  if(att.rageChar) att.rage=Math.min(1,att.rage+0.05); if(opp.rageChar) opp.rage=Math.min(1,opp.rage+0.035);
   spawnHitFx(opp.x,opp.y+1.2,opp.z,sk.color,heavy);
   spawnDamage(opp.x,opp.y+2.0,opp.z,dmg,heavy);
-  if(opp.immuneT>0){ /* 면역: 경직·넉백·띄우기 등 해로운 효과 무시(데미지는 받음) */ }
+  if(opp.dummy){ opp.stun=Math.max(opp.stun,sk.stun); }                 // 더미: 경직만(콤보 표시)·넉백/KO 없음
+  else if(opp.immuneT>0){ /* 면역: 경직·넉백·띄우기 등 해로운 효과 무시(데미지는 받음) */ }
   else {
     opp.stun=Math.max(opp.stun,sk.stun);
     if(sk.react==='knock'){ opp.vx=dir.x*sk.kb; opp.vz=dir.z*sk.kb; }
@@ -573,9 +638,9 @@ function applyHit(att,opp,sk,srcIdx){
   // 궁극 충전: 준 데미지(자기) + 받은 데미지(상대)를 각자 최대체력 비율로 → 저딜/열세도 확보
   if(!att.ultReady){ att.ultCharge=Math.min(1, att.ultCharge+dmg/(0.55*att.maxHp));
     if(att.ultCharge>=1){ att.ultReady=true; spawnReady(att,'P'); } }
-  if(!opp.ultReady){ opp.ultCharge=Math.min(1, opp.ultCharge+dmg*0.6/(0.55*opp.maxHp));
+  if(!opp.dummy && !opp.ultReady){ opp.ultCharge=Math.min(1, opp.ultCharge+dmg*0.6/(0.55*opp.maxHp));
     if(opp.ultCharge>=1){ opp.ultReady=true; spawnReady(opp,'P'); } }
-  if(opp.hp<=0) onKO(opp);
+  if(!opp.dummy && opp.hp<=0) onKO(opp);
 }
 
 // 히트 스파크
@@ -624,6 +689,8 @@ function processAction(f){
   if(sk.special==='immune'){ updateImmune(f,sk); return; }           // 게이: 면역
   if(sk.special==='deathroll'){ updateDeathRoll(f,sk); return; }     // 게이: 데스롤
   if(sk.special==='healcharge'){ updateHealCharge(f,sk); return; }   // 게이 궁극: 회복 돌진
+  if(sk.special==='grab'){ updateGrab(f,sk); return; }               // 포획가: 커맨드 잡기
+  if(sk.special==='teleport'){ updateTeleport(f,sk); return; }       // 암살자: 그림자 이동
   const s=sk.startup,a=sk.active,r=sk.recovery,T=f.act.t;
   if(T===s && sk.type==='dash'){ f.vx=f.dir.x*sk.dashSpeed; f.vz=f.dir.z*sk.dashSpeed; }
   if(T===s && sk.type==='proj'){ spawnProjectiles(f,sk,f.act.idx); } // 물방울 투척
@@ -763,6 +830,31 @@ function updateHealCharge(f,sk){
   if(a.t>sk.startup+(sk.active||55)) f.act=null;
 }
 
+// ── 포획가: 커맨드 잡기(즉발 근접 성립 → 붙잡았다가 내던짐) ──
+function updateGrab(f,sk){
+  const a=f.act, opp=f.foe;
+  if(a.t===0){ a.dir={x:f.dir.x,z:f.dir.z};
+    a.grab=!!(opp && !opp.dead && opp.invuln<=0 && opp.immuneT<=0 && meleeConnect(f,sk)); }
+  a.t++;
+  if(a.grab && opp && !opp.dead){
+    opp.x=f.x+a.dir.x*1.3; opp.z=f.z+a.dir.z*1.3; opp.vx=0; opp.vz=0; opp.stun=Math.max(opp.stun,4); opp.air=false;
+    if(a.t>=sk.startup+sk.active){ applyHit(f,opp,sk); f.act=null; }   // 내던지기(dmg+넉백/띄움)
+  } else if(a.t>sk.startup+sk.recovery) f.act=null;                    // 헛잡음(후딜 처벌각)
+}
+// ── 암살자: 그림자 이동(적 등 뒤로 순간이동, followHit면 도착 후 타격) ──
+function updateTeleport(f,sk){
+  const a=f.act, opp=f.foe;
+  if(a.t===0 && opp){
+    const dx=f.x-opp.x, dz=f.z-opp.z, d=Math.hypot(dx,dz)||1;
+    f.x=opp.x - dx/d*1.6; f.z=opp.z - dz/d*1.6;                       // 적 반대편(뒤)
+    const c=clampBounds(f.x,f.z); f.x=c.x; f.z=c.z; f.invuln=14;
+    f.dir=dirTo(f,opp); spawnHitFx(f.x,f.y+1,f.z,'#c0a0ff',false); sfx('whoosh');
+    if(sk.followHit && meleeConnect(f,sk)) applyHit(f,opp,sk);
+  }
+  a.t++;
+  if(a.t>sk.startup+sk.recovery) f.act=null;
+}
+
 // ── AI (근접) ──
 function aiThink(f){ const opp=f.foe,dx=opp.x-f.x,dz=opp.z-f.z,dist=Math.hypot(dx,dz);
   f.aiMvx=0;f.aiMvz=0;f.aiJump=false;
@@ -787,6 +879,7 @@ function tickFighter(f){
   if(f.down){ f.downT--; if(f.downT<=0)f.down=false; }
   if(f.comboTimer>0){ f.comboTimer--; if(f.comboTimer===0)f.combo=0; }
   f.moving=false; f.dir=dirTo(f,f.foe);
+  if(f.dummy){ f.x=0; f.z=0; f.y=0; f.air=false; f.vx=0; f.vz=0; return; }   // 훈련 더미: 중앙 고정·무행동
   const canAct=phase==='fight'&&f.stun<=0&&!f.down&&!f.dead;
   let mvx=0,mvz=0,jump=false,skillReq=null;
   if(canAct){
@@ -799,7 +892,7 @@ function tickFighter(f){
     f.act={idx:skillReq,t:0,hasHit:false,lastHit:-99}; f.cd[skillReq]=f.skills[skillReq].cd; sfx('whoosh');
     if(skillReq===6){ f.ultReady=false; f.ultCharge=0; ultCinematic(f); } }
   if(canAct&&!f.act&&jump&&!f.air){ f.vy=JUMP; f.air=true; }
-  if(canAct&&!f.act){ if(mvx||mvz){ const l=Math.hypot(mvx,mvz); f.vx=mvx/l*f.speed; f.vz=mvz/l*f.speed; f.moving=true; }
+  if(canAct&&!f.act){ const spd=f.speed*(f.rageChar?1+f.rage*0.25:1); if(mvx||mvz){ const l=Math.hypot(mvx,mvz); f.vx=mvx/l*spd; f.vz=mvz/l*spd; f.moving=true; }
     else { f.vx*=.78; f.vz*=.78; } }
   if(f.act) processAction(f);
   if(f.air||f.y>0){ f.vy-=GRAV; f.y+=f.vy;
@@ -857,7 +950,7 @@ function tick(){
   else if(phase==='win'){ phaseT--;
     if(phaseT%5===0&&winnerRef) spawnHitFx(winnerRef.x+(Math.random()-.5)*2.4,1+Math.random()*2.6,winnerRef.z+(Math.random()-.5)*2.4,'#ffd24a',false);
     if(phaseT<=0) showResult(); }
-  else if(phase==='fight'){ timeTick++; if(timeTick>=60){ timeTick=0; if(timeLeft>0){ timeLeft--; if(timeLeft<=0 && !overdrive) enterOverdrive(); } } }
+  else if(phase==='fight' && !trainingMode){ timeTick++; if(timeTick>=60){ timeTick=0; if(timeLeft>0){ timeLeft--; if(timeLeft<=0 && !overdrive) enterOverdrive(); } } }
   if(fighters.length){ tickFighter(f1); tickFighter(f2); updateProjectiles(); }
 }
 
@@ -977,6 +1070,7 @@ function updateTray(f){
   }
 }
 function updateTimer(){ const el=document.getElementById('timer');
+  if(trainingMode){ el.textContent=''; return; }
   if(overdrive){ el.textContent='×2'; el.style.color='#ff5050'; }
   else { el.textContent=Math.ceil(timeLeft); el.style.color='#fff'; } }
 
@@ -992,7 +1086,7 @@ function frame(now){
     syncMesh(f1,now); syncMesh(f2,now);
     updateHP(false); updateTray(f1); updateTimer();
     updateCombo(f1,'combo1',0); updateCombo(f2,'combo2',1);
-    updateDamageNumbers();
+    updateDamageNumbers(); if(trainingMode) updateTrainInfo();
   }
   updateCamera(now); updateFx();
   if(cineT>0) cineT--;
@@ -1013,6 +1107,8 @@ addEventListener('keydown',e=>{
     return;
   }
   keys[e.code]=true;
+  if(e.code==='Escape'){ gotoTitle(); e.preventDefault(); return; }
+  if(trainingMode && e.code==='KeyR' && !e.repeat){ trainDamage=0; trainBestCombo=0; }
   if(e.code==='Space'){ if(f1)f1.jumpReq=true; e.preventDefault(); }
   if(e.code==='KeyP'&&!e.repeat&&f1){ f1.skillReq=6; }
   else if((e.code in SKILLKEY)&&!e.repeat&&f1){ let idx=SKILLKEY[e.code]; if(e.shiftKey)idx+=3; f1.skillReq=idx; }
@@ -1065,10 +1161,10 @@ function ensureHint(){ if(navHint) return navHint;
   document.body.appendChild(navHint); return navHint; }
 function setNav(id){
   let list=[];
-  if(id==='title') list=[document.getElementById('playBtn')];
+  if(id==='title') list=[document.getElementById('playBtn'), document.getElementById('trainBtn')];
   else if(id==='select') list=Array.from(document.querySelectorAll('#roster .rcard')).concat(
     [document.getElementById('confirmBtn'), document.getElementById('backTitle')]);
-  else if(id==='result') list=[document.getElementById('rematchBtn'), document.getElementById('toSelect')];
+  else if(id==='result') list=[document.getElementById('rematchBtn'), document.getElementById('toSelect'), document.getElementById('toTitle')];
   navList=list; navIdx=0;
   if(id==='select'){ const cards=Array.from(document.querySelectorAll('#roster .rcard'));
     const i=cards.findIndex(el=>el.dataset.char===selChar); if(i>=0) navIdx=i; }
@@ -1081,16 +1177,36 @@ function navActivate(){ if(!navList.length) return; const el=navList[navIdx];
   if(el.dataset && el.dataset.char) doConfirm(); else el.click(); }
 
 // ── 메뉴 동작 ──
-function gotoSelect(){ resetOverdrive(); phase='select'; buildRoster(); fillSelInfo(); makePreview(selChar); show('select'); }
+function gotoSelect(){ resetOverdrive(); phase='select'; buildRoster(); fillSelInfo(); makePreview(selChar); show('select');
+  document.getElementById('confirmBtn').textContent = trainingMode ? '훈련 시작' : '대결 시작'; }
+function gotoTitle(){ resetOverdrive(); trainingMode=false;
+  fighters.forEach(f=>scene.remove(f.mesh)); fighters=[]; f1=f2=null; clearProjectiles();
+  document.getElementById('trainInfo').style.display='none'; setHUD(false); phase='title'; show('title'); }
+function startTraining(pc){
+  fighters.forEach(f=>scene.remove(f.mesh)); clearProjectiles(); resetOverdrive();
+  trainingMode=true; trainDamage=0; trainBestCombo=0;
+  f1=makeFighter(0,pc,true); f2=makeFighter(1,'gei',false);
+  f2.dummy=true; f2.maxHp=99999; f2.hp=99999;
+  f1.foe=f2; f2.foe=f1; fighters=[f1,f2];
+  f1.x=-4; f1.z=3; f2.x=0; f2.z=0; f1.dir=dirTo(f1,f2);
+  document.getElementById('nm1').textContent=CHARS[pc].name; document.getElementById('rl1').textContent=CHARS[pc].role;
+  document.getElementById('nm2').textContent='더미'; document.getElementById('rl2').textContent='DUMMY';
+  buildTray(f1); setHUD(true); document.getElementById('trainInfo').style.display='block';
+  show(null); phase='fight'; }
+function updateTrainInfo(){ if(!trainingMode||!f1) return;
+  document.getElementById('trainInfo').innerHTML='누적 데미지 <b>'+trainDamage+'</b> · 콤보 '+(f1.combo>1?f1.combo:0)+' (최고 '+trainBestCombo+')<br><span class="thint">R 초기화 · ESC 메뉴</span>'; }
 function doConfirm(){ sfx('ui');
+  if(trainingMode){ if(preview){ scene.remove(preview.mesh); preview=null; } startTraining(selChar); return; }   // 훈련장
   curPlayer=selChar; const others=ROSTER.filter(x=>x!==selChar); curCpu=others[(Math.random()*others.length)|0];
   if(preview){ scene.remove(preview.mesh); preview=null; }
   document.getElementById('vsn1').textContent=CHARS[curPlayer].name; document.getElementById('vsem1').textContent=CHARS[curPlayer].emoji;
   document.getElementById('vsn2').textContent=CHARS[curCpu].name; document.getElementById('vsem2').textContent=CHARS[curCpu].emoji;
   phase='vs'; show('vs');
   setTimeout(()=>{ show(null); startMatch(curPlayer,curCpu); }, 1300); }
-document.getElementById('playBtn').onclick=()=>{ sfx('ui'); gotoSelect(); };
-document.getElementById('backTitle').onclick=()=>{ sfx('ui'); if(preview){ scene.remove(preview.mesh); preview=null; } phase='title'; show('title'); };
+document.getElementById('playBtn').onclick=()=>{ sfx('ui'); trainingMode=false; gotoSelect(); };
+document.getElementById('trainBtn').onclick=()=>{ sfx('ui'); trainingMode=true; gotoSelect(); };
+document.getElementById('toTitle').onclick=()=>{ sfx('ui'); gotoTitle(); };
+document.getElementById('backTitle').onclick=()=>{ sfx('ui'); if(preview){ scene.remove(preview.mesh); preview=null; } trainingMode=false; phase='title'; show('title'); };
 document.getElementById('confirmBtn').onclick=doConfirm;
 document.getElementById('rematchBtn').onclick=()=>{ sfx('ui'); show(null); setHUD(true); wins=[0,0]; round=1; beginRound(); };
 document.getElementById('toSelect').onclick=()=>{ sfx('ui'); fighters.forEach(f=>scene.remove(f.mesh)); fighters=[]; f1=f2=null; gotoSelect(); };
